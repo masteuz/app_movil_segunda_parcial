@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "243783044396",
+    "project_id": "appmovil2024-73ae8",
+    "storage_bucket": "appmovil2024-73ae8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243783044396:android:d5d58d86c6f64875ca7089",
+        "android_client_info": {
+          "package_name": "com.segunda_parcial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkd6hy4TXhxBZKe61eXsUhNs11PxEw-eM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
