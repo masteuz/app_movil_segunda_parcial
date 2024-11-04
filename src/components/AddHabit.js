@@ -1,47 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddHabit = ({ route, navigation }) => {
-  const { userId } = route.params; // Recibe el ID del usuario
-  
+  const { userId, habitId } = route.params || {}; // Recibe el ID del usuario y el ID del hábito
+
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [frecuencia, setFrecuencia] = useState(''); // Puedes ajustar el formato según tu interfaz
+  const [frecuencia, setFrecuencia] = useState('');
   const [horaRecordatorio, setHoraRecordatorio] = useState(new Date());
   const [completado, setCompletado] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Función para mostrar el selector de hora
+  // Cargar datos del hábito en modo de edición
+  useEffect(() => {
+    if (habitId) {
+      const loadHabitData = async () => {
+        try {
+          const habitSnapshot = await firestore().collection('Habitos').doc(habitId).get();
+          if (habitSnapshot.exists) {
+            const habitData = habitSnapshot.data();
+            setNombre(habitData.nombre);
+            setDescripcion(habitData.descripcion);
+            setFrecuencia(habitData.frecuencia.join(', '));
+            setHoraRecordatorio(habitData.hora_recordatorio.toDate());
+            setCompletado(habitData.completado);
+          }
+        } catch (error) {
+          console.error("Error al cargar hábito:", error);
+          Alert.alert("Error", "Hubo un problema al cargar el hábito");
+        }
+      };
+      loadHabitData();
+    }
+  }, [habitId]);
+
+  // Función para manejar la selección de hora
   const onChangeHora = (event, selectedDate) => {
     const currentDate = selectedDate || horaRecordatorio;
     setShowTimePicker(false);
     setHoraRecordatorio(currentDate);
   };
 
-  // Función para guardar el hábito en Firestore
-  const handleAddHabit = async () => {
+  // Función para agregar o actualizar el hábito en Firestore
+  const handleSaveHabit = async () => {
     try {
-      await firestore().collection('Habitos').add({
+      const habitData = {
         usuario_id: userId,
         nombre: nombre,
         descripcion: descripcion,
-        frecuencia: frecuencia.split(',').map(day => day.trim()), // Convierte frecuencia en un array
-        hora_recordatorio: horaRecordatorio, // Guarda el timestamp de la hora seleccionada
+        frecuencia: frecuencia.split(',').map(day => day.trim()),
+        hora_recordatorio: horaRecordatorio,
         completado: completado,
-      });
-      Alert.alert('Éxito', 'Hábito agregado exitosamente');
+      };
+
+      if (habitId) {
+        // Modo edición
+        await firestore().collection('Habitos').doc(habitId).update(habitData);
+        Alert.alert("Éxito", "Hábito actualizado exitosamente");
+      } else {
+        // Modo creación
+        await firestore().collection('Habitos').add(habitData);
+        Alert.alert("Éxito", "Hábito agregado exitosamente");
+      }
       navigation.navigate('Home');
     } catch (error) {
-      console.error('Error al agregar hábito:', error);
-      Alert.alert('Error', 'Hubo un problema al agregar el hábito');
+      console.error("Error al guardar hábito:", error);
+      Alert.alert("Error", "Hubo un problema al guardar el hábito");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Agregar Hábito</Text>
+      <Text style={styles.title}>{habitId ? "Editar Hábito" : "Agregar Hábito"}</Text>
 
       <TextInput
         style={styles.input}
@@ -76,7 +108,7 @@ const AddHabit = ({ route, navigation }) => {
         />
       )}
 
-      <Button title="Guardar Hábito" onPress={handleAddHabit} />
+      <Button title={habitId ? "Actualizar Hábito" : "Guardar Hábito"} onPress={handleSaveHabit} />
     </View>
   );
 };

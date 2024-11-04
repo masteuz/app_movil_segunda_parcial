@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import auth, { getAuth } from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -13,9 +14,16 @@ const Register = ({ navigation }) => {
       return;
     }
 
-
     try {
-      let user = await auth().createUserWithEmailAndPassword(email, password);
+      // Crear usuario en Firebase Authentication
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userId = userCredential.user.uid;
+
+      // Guardar información del usuario en Firestore
+      await firestore().collection('Usuarios').doc(userId).set({
+        email: email
+      });
+
       Alert.alert('Éxito', 'Cuenta creada exitosamente');
       navigation.navigate('Login'); // Redirige a la pantalla de inicio de sesión
     } catch (error) {

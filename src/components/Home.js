@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, Alert, Switch } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { ListItem } from '@rneui/themed';
@@ -43,13 +43,50 @@ export default function Home({ navigation }) {
     }, [user])
   );
 
+  // Función para cambiar el estado de "completado"
+  const toggleCompletado = async (habitId, currentStatus) => {
+    try {
+      await firestore().collection('Habitos').doc(habitId).update({
+        completado: !currentStatus, // Cambia a true si es false, y viceversa
+      });
+      loadData(); // Recargar los datos después de actualizar el estado
+    } catch (error) {
+      console.error('Error al actualizar estado de completado:', error);
+      Alert.alert('Error', 'Hubo un problema al actualizar el estado del hábito');
+    }
+  };
+
+  // Función para eliminar un hábito
+  const handleDelete = async (habitId) => {
+    try {
+      await firestore().collection('Habitos').doc(habitId).delete();
+      Alert.alert('Hábito eliminado', 'El hábito ha sido eliminado exitosamente');
+      loadData(); // Recargar los datos después de la eliminación
+    } catch (error) {
+      console.error('Error al eliminar hábito:', error);
+      Alert.alert('Error', 'Hubo un problema al eliminar el hábito');
+    }
+  };
+
+  const confirmDelete = (habitId) => {
+    Alert.alert(
+      "Eliminar Hábito",
+      "¿Estás seguro de que deseas eliminar este hábito?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", onPress: () => handleDelete(habitId) }
+      ]
+    );
+  };
+  
+
   if (initializing) return null;
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Mis Hábitos</Text>
       
-      {/* Botón para navegar a AddHabit y pasar el ID del usuario */}
+      {/* Botón para navegar a AddHabit en modo de creación */}
       <Button 
         title="Agregar Hábito"
         onPress={() => navigation.navigate('AddHabit', { userId: user.uid })}
@@ -65,8 +102,30 @@ export default function Home({ navigation }) {
               <ListItem.Subtitle style={styles.subtitle}>Descripción: {item.descripcion}</ListItem.Subtitle>
               <Text style={styles.detail}>Frecuencia: {item.frecuencia.join(', ')}</Text>
               <Text style={styles.detail}>Hora Recordatorio: {item.hora_recordatorio.toDate().toLocaleTimeString()}</Text>
-              <Text style={styles.detail}>Completado: {item.completado ? 'Sí' : 'No'}</Text>
+              
+              {/* Switch para cambiar el estado de completado */}
+              <View style={styles.switchContainer}>
+                <Text style={styles.detail}>Completado: {item.completado ? 'Sí' : 'No'}</Text>
+                <Switch
+                  value={item.completado}
+                  onValueChange={() => toggleCompletado(item.id, item.completado)}
+                />
+              </View>
             </ListItem.Content>
+            
+            {/* Botón de edición */}
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('AddHabit', { userId: user.uid, habitId: item.id })}
+            >
+              <Text style={styles.editButton}>Editar</Text>
+            </TouchableOpacity>
+
+            {/* Botón de eliminación */}
+            <TouchableOpacity 
+              onPress={() => confirmDelete(item.id)}
+            >
+              <Text style={styles.deleteButton}>Eliminar</Text>
+            </TouchableOpacity>
           </ListItem>
         )}
       />
@@ -97,5 +156,21 @@ const styles = StyleSheet.create({
   detail: {
     fontSize: 14,
     color: '#333',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  editButton: {
+    color: 'blue',
+    fontSize: 14,
+    padding: 5,
+  },
+  deleteButton: {
+    color: 'red',
+    fontSize: 14,
+    padding: 5,
+    marginLeft: 10,
   },
 });
