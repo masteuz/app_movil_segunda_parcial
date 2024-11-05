@@ -70,6 +70,12 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
+
+      <Button
+        title="Configuración de Usuario"
+        onPress={() => navigation.navigate('UserSettings')}
+      />
+
       <Text style={styles.header}>Mis Hábitos</Text>
 
       <Button
