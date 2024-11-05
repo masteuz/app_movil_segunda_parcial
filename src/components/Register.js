@@ -6,10 +6,33 @@ import firestore from '@react-native-firebase/firestore';
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Función para validar el formato de correo electrónico
+  const isValidEmail = (email) => {
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return emailRegex.test(email);
+  };
+
+  // Función para validar la longitud de la contraseña
+  const isValidPassword = (password) => {
+    return password.length >= 6;
+  };
+
+  // Función para manejar el registro con validaciones
   const handleRegister = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Por favor, ingresa un correo electrónico y una contraseña');
+    if (!isValidEmail(email)) {
+      Alert.alert('Error', 'Por favor ingresa un correo electrónico válido.');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Las contraseñas no coinciden.');
       return;
     }
 
@@ -50,6 +73,15 @@ const Register = ({ navigation }) => {
         placeholderTextColor="#aaa"
         value={password}
         onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmar Contraseña"
+        placeholderTextColor="#aaa"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
         secureTextEntry
       />
 

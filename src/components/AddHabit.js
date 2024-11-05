@@ -14,6 +14,8 @@ const AddHabit = ({ route, navigation }) => {
 
   const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
+
+
   useEffect(() => {
     if (habitId) {
       const loadHabitData = async () => {
@@ -50,6 +52,14 @@ const AddHabit = ({ route, navigation }) => {
   };
 
   const handleSaveHabit = async () => {
+    if (!nombre) {
+      Alert.alert('Error', 'Por favor, ingresa un nombre para el habito');
+      return;
+    }
+    if (frecuencia.length === 0) {
+      Alert.alert('Error', 'Por favor, selecciona al menos un dia para el habito');
+      return;
+    }
     try {
       const habitData = {
         usuario_id: userId,

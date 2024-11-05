@@ -5,9 +5,18 @@ import auth from '@react-native-firebase/auth';
 const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return emailRegex.test(email);
+  };
+
   const handlePasswordReset = async () => {
     if (!email) {
       Alert.alert('Error', 'Por favor, ingresa un correo electrónico');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      Alert.alert('Error', 'Por favor ingresa un correo electrónico válido.');
       return;
     }
 
