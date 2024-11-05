@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddHabit = ({ route, navigation }) => {
-  const { userId, habitId } = route.params || {}; // Recibe el ID del usuario y el ID del hábito
+  const { userId, habitId } = route.params || {};
 
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [frecuencia, setFrecuencia] = useState('');
   const [horaRecordatorio, setHoraRecordatorio] = useState(new Date());
-  const [completado, setCompletado] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Cargar datos del hábito en modo de edición
   useEffect(() => {
     if (habitId) {
       const loadHabitData = async () => {
@@ -25,7 +23,6 @@ const AddHabit = ({ route, navigation }) => {
             setDescripcion(habitData.descripcion);
             setFrecuencia(habitData.frecuencia.join(', '));
             setHoraRecordatorio(habitData.hora_recordatorio.toDate());
-            setCompletado(habitData.completado);
           }
         } catch (error) {
           console.error("Error al cargar hábito:", error);
@@ -36,31 +33,26 @@ const AddHabit = ({ route, navigation }) => {
     }
   }, [habitId]);
 
-  // Función para manejar la selección de hora
   const onChangeHora = (event, selectedDate) => {
     const currentDate = selectedDate || horaRecordatorio;
     setShowTimePicker(false);
     setHoraRecordatorio(currentDate);
   };
 
-  // Función para agregar o actualizar el hábito en Firestore
   const handleSaveHabit = async () => {
     try {
       const habitData = {
         usuario_id: userId,
-        nombre: nombre,
-        descripcion: descripcion,
+        nombre,
+        descripcion,
         frecuencia: frecuencia.split(',').map(day => day.trim()),
         hora_recordatorio: horaRecordatorio,
-        completado: completado,
       };
 
       if (habitId) {
-        // Modo edición
         await firestore().collection('Habitos').doc(habitId).update(habitData);
         Alert.alert("Éxito", "Hábito actualizado exitosamente");
       } else {
-        // Modo creación
         await firestore().collection('Habitos').add(habitData);
         Alert.alert("Éxito", "Hábito agregado exitosamente");
       }
@@ -78,6 +70,7 @@ const AddHabit = ({ route, navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Nombre del Hábito"
+        placeholderTextColor="#aaa"
         value={nombre}
         onChangeText={setNombre}
       />
@@ -85,6 +78,7 @@ const AddHabit = ({ route, navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Descripción"
+        placeholderTextColor="#aaa"
         value={descripcion}
         onChangeText={setDescripcion}
       />
@@ -92,11 +86,14 @@ const AddHabit = ({ route, navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Frecuencia (ej: lunes, miércoles)"
+        placeholderTextColor="#aaa"
         value={frecuencia}
         onChangeText={setFrecuencia}
       />
 
-      <Button title="Seleccionar Hora de Recordatorio" onPress={() => setShowTimePicker(true)} />
+      <TouchableOpacity style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
+        <Text style={styles.buttonText}>Seleccionar Hora de Recordatorio</Text>
+      </TouchableOpacity>
 
       {showTimePicker && (
         <DateTimePicker
@@ -108,7 +105,9 @@ const AddHabit = ({ route, navigation }) => {
         />
       )}
 
-      <Button title={habitId ? "Actualizar Hábito" : "Guardar Hábito"} onPress={handleSaveHabit} />
+      <TouchableOpacity style={styles.saveButton} onPress={handleSaveHabit}>
+        <Text style={styles.buttonText}>{habitId ? "Actualizar Hábito" : "Guardar Hábito"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -118,18 +117,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#f7f7f7',
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#ddd',
     borderWidth: 1,
     marginBottom: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  timeButton: {
+    backgroundColor: '#6200EE',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  saveButton: {
+    backgroundColor: '#6200EE',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

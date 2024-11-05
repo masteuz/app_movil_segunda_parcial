@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -59,13 +59,18 @@ const UserSettings = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Nombre de usuario"
+        placeholderTextColor="#aaa"
         value={username}
         onChangeText={setUsername}
       />
 
-      <Button title="Guardar Cambios" onPress={handleSave} />
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <Text style={styles.buttonText}>Guardar Cambios</Text>
+      </TouchableOpacity>
 
-      <Button title="Cerrar Sesión" color="red" onPress={handleLogout} />
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Cerrar Sesión</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -75,19 +80,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7', // Fondo suave
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#ddd',
     borderWidth: 1,
     marginBottom: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  saveButton: {
+    backgroundColor: '#6200EE',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#FF5252',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

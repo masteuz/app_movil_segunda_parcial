@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -7,7 +7,6 @@ const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Función para manejar el registro de usuario
   const handleRegister = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Por favor, ingresa un correo electrónico y una contraseña');
@@ -15,17 +14,15 @@ const Register = ({ navigation }) => {
     }
 
     try {
-      // Crear usuario en Firebase Authentication
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const userId = userCredential.user.uid;
 
-      // Guardar información del usuario en Firestore
       await firestore().collection('Usuarios').doc(userId).set({
-        email: email
+        email: email,
       });
 
       Alert.alert('Éxito', 'Cuenta creada exitosamente');
-      navigation.navigate('Login'); // Redirige a la pantalla de inicio de sesión
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Error al crear cuenta:', error.message);
       Alert.alert('Error', 'Hubo un problema al crear la cuenta. Verifica los datos ingresados.');
@@ -35,10 +32,12 @@ const Register = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Crear Cuenta</Text>
+      <Text style={styles.subtitle}>Ingresa tu información para registrarte</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Correo Electrónico"
+        placeholderTextColor="#aaa"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -48,12 +47,19 @@ const Register = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
+        placeholderTextColor="#aaa"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
-      <Button title="Registrar" onPress={handleRegister} />
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Registrar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -63,18 +69,49 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#f7f7f7',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
     textAlign: 'center',
     marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#ddd',
     borderWidth: 1,
     marginBottom: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#6200EE',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  link: {
+    color: '#6200EE',
+    textAlign: 'center',
+    marginTop: 15,
+    fontSize: 15,
   },
 });
 

@@ -32,7 +32,7 @@ const Progress = ({ route }) => {
           return;
         }
 
-        const progressData = progressSnapshot.docs.map(doc => doc.data()).reverse(); // Invierte para mostrar en orden ascendente
+        const progressData = progressSnapshot.docs.map(doc => doc.data()).reverse();
 
         // Agrupar por semana para el gráfico de barras
         const weeklyData = {};
@@ -45,11 +45,7 @@ const Progress = ({ route }) => {
         setWeeklyCounts(Object.values(weeklyData));
 
         // Para el gráfico de líneas, convertir los timestamps en fechas legibles
-        const dates = progressData.map(item => {
-          const fecha = item.fecha.toDate();
-          return dayjs(fecha).format('DD/MM/YYYY');
-        });
-
+        const dates = progressData.map(item => dayjs(item.fecha.toDate()).format('DD/MM/YYYY'));
         const counts = progressData.map(item => (item.completado ? 1 : 0));
 
         setDailyLabels(dates);
@@ -73,29 +69,22 @@ const Progress = ({ route }) => {
               labels: weeklyLabels,
               datasets: [{ data: weeklyCounts }],
             }}
-            width={screenWidth + weeklyLabels.length * 20} // Ancho ajustable para desplazamiento
+            width={screenWidth + weeklyLabels.length * 20} // Ajustable para desplazamiento
             height={220}
-            yAxisLabel=""
             yAxisSuffix=" días"
             chartConfig={{
-              backgroundColor: '#1E2923',
-              backgroundGradientFrom: '#08130D',
-              backgroundGradientTo: '#08130D',
+              backgroundGradientFrom: '#f7f7f7',
+              backgroundGradientTo: '#f7f7f7',
               decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              color: (opacity = 1) => `rgba(98, 0, 238, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(60, 60, 60, ${opacity})`,
               style: { borderRadius: 16 },
-              propsForDots: {
-                r: '6',
-                strokeWidth: '2',
-                stroke: '#ffa726',
-              },
             }}
             style={{
               marginVertical: 8,
               borderRadius: 16,
             }}
-            fromZero // Inicia el eje y en cero
+            fromZero
           />
         </ScrollView>
       ) : (
@@ -111,29 +100,27 @@ const Progress = ({ route }) => {
               labels: dailyLabels,
               datasets: [{ data: dailyCounts }],
             }}
-            width={screenWidth + dailyLabels.length * 20} // Ancho ajustable para desplazamiento
+            width={screenWidth + dailyLabels.length * 40} // Ajustable para desplazamiento
             height={220}
-            yAxisLabel=""
             yAxisSuffix=" "
             chartConfig={{
-              backgroundColor: '#1E2923',
-              backgroundGradientFrom: '#08130D',
-              backgroundGradientTo: '#08130D',
+              backgroundGradientFrom: '#f7f7f7',
+              backgroundGradientTo: '#f7f7f7',
               decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              color: (opacity = 1) => `rgba(98, 0, 238, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(60, 60, 60, ${opacity})`,
               style: { borderRadius: 16 },
               propsForDots: {
                 r: '6',
                 strokeWidth: '2',
-                stroke: '#ffa726',
+                stroke: '#6200EE',
               },
             }}
             style={{
               marginVertical: 8,
               borderRadius: 16,
             }}
-            fromZero // Inicia el eje y en cero
+            fromZero
           />
         </ScrollView>
       ) : (
@@ -147,11 +134,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
   header: {
     fontSize: 24,
+    fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
   },
   noData: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,7 +9,8 @@ import Register from './src/components/Register';
 import UserSettings from './src/components/UserSettings'
 import AddHabit from './src/components/AddHabit';
 import Progress from './src/components/Progress';
-import { Text } from 'react-native';
+
+
 
 const Stack = createStackNavigator();
 
@@ -24,11 +25,15 @@ export default function App() {
           <Stack.Screen options={{
             header: () => null
           }} name="Home" component={Home} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-          <Stack.Screen name="Register" component={Register} />
-          <Stack.Screen name="AddHabit" component={AddHabit} />
-          <Stack.Screen name="UserSettings" component={UserSettings} />
-          <Stack.Screen name="Progress" component={Progress} />
+          <Stack.Screen options={{
+            header: () => null
+          }} name="ForgotPassword" component={ForgotPassword} />
+          <Stack.Screen options={{
+            header: () => null
+          }} name="Register" component={Register} />
+          <Stack.Screen name="Agregar Habito" component={AddHabit} />
+          <Stack.Screen name="Ajustes" component={UserSettings} />
+          <Stack.Screen name="Progresos" component={Progress} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
