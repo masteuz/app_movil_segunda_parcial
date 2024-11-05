@@ -116,7 +116,7 @@ export default function Home({ navigation }) {
           <ListItem bottomDivider containerStyle={styles.listItem}>
             <ListItem.Content>
               <ListItem.Title style={styles.title}>{item.nombre}</ListItem.Title>
-              <ListItem.Subtitle style={styles.subtitle}>Descripción: {item.descripcion}</ListItem.Subtitle>
+              <ListItem.Subtitle style={styles.subtitle}>{item.descripcion}</ListItem.Subtitle>
               <Text style={styles.detail}>Frecuencia: {item.frecuencia.join(', ')}</Text>
               <Text style={styles.detail}>Hora Recordatorio: {item.hora_recordatorio.toDate().toLocaleTimeString()}</Text>
               <View style={styles.buttonContainer}>

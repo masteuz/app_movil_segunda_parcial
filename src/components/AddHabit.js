@@ -8,9 +8,11 @@ const AddHabit = ({ route, navigation }) => {
 
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [frecuencia, setFrecuencia] = useState('');
+  const [frecuencia, setFrecuencia] = useState([]); // Cambiado a un array
   const [horaRecordatorio, setHoraRecordatorio] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   useEffect(() => {
     if (habitId) {
@@ -21,7 +23,7 @@ const AddHabit = ({ route, navigation }) => {
             const habitData = habitSnapshot.data();
             setNombre(habitData.nombre);
             setDescripcion(habitData.descripcion);
-            setFrecuencia(habitData.frecuencia.join(', '));
+            setFrecuencia(habitData.frecuencia || []);
             setHoraRecordatorio(habitData.hora_recordatorio.toDate());
           }
         } catch (error) {
@@ -39,13 +41,21 @@ const AddHabit = ({ route, navigation }) => {
     setHoraRecordatorio(currentDate);
   };
 
+  const toggleDaySelection = (day) => {
+    if (frecuencia.includes(day)) {
+      setFrecuencia(frecuencia.filter(d => d !== day));
+    } else {
+      setFrecuencia([...frecuencia, day]);
+    }
+  };
+
   const handleSaveHabit = async () => {
     try {
       const habitData = {
         usuario_id: userId,
         nombre,
         descripcion,
-        frecuencia: frecuencia.split(',').map(day => day.trim()),
+        frecuencia, // frecuencia ahora es un array de días
         hora_recordatorio: horaRecordatorio,
       };
 
@@ -83,13 +93,20 @@ const AddHabit = ({ route, navigation }) => {
         onChangeText={setDescripcion}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Frecuencia (ej: lunes, miércoles)"
-        placeholderTextColor="#aaa"
-        value={frecuencia}
-        onChangeText={setFrecuencia}
-      />
+      <Text style={styles.label}>Frecuencia</Text>
+      <View style={styles.daysContainer}>
+        {daysOfWeek.map(day => (
+          <TouchableOpacity
+            key={day}
+            style={[styles.dayButton, frecuencia.includes(day) && styles.dayButtonSelected]}
+            onPress={() => toggleDaySelection(day)}
+          >
+            <Text style={[styles.dayText, frecuencia.includes(day) && styles.dayTextSelected]}>
+              {day.slice(0, 10)} {/* Muestra solo las primeras letras */}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <TouchableOpacity style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
         <Text style={styles.buttonText}>Seleccionar Hora de Recordatorio</Text>
@@ -136,6 +153,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     color: '#333',
+  },
+  label: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+  },
+  daysContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+  },
+  dayButton: {
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    margin: 4,
+  },
+  dayButtonSelected: {
+    backgroundColor: '#6200EE',
+  },
+  dayText: {
+    color: '#333',
+    fontSize: 14,
+  },
+  dayTextSelected: {
+    color: '#fff',
   },
   timeButton: {
     backgroundColor: '#6200EE',

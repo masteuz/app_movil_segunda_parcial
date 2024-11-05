@@ -4,6 +4,7 @@ import firestore from '@react-native-firebase/firestore';
 import { BarChart, LineChart } from 'react-native-chart-kit';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 dayjs.extend(isoWeek);
 
@@ -45,7 +46,7 @@ const Progress = ({ route }) => {
         setWeeklyCounts(Object.values(weeklyData));
 
         // Para el gráfico de líneas, convertir los timestamps en fechas legibles
-        const dates = progressData.map(item => dayjs(item.fecha.toDate()).format('DD/MM/YYYY'));
+        const dates = progressData.map(item => dayjs(item.fecha.toDate()).format('dddd ' + 'DD/MM/YYYY'));
         const counts = progressData.map(item => (item.completado ? 1 : 0));
 
         setDailyLabels(dates);
@@ -64,7 +65,7 @@ const Progress = ({ route }) => {
 
       {weeklyCounts.length > 0 ? (
         <ScrollView horizontal>
-          <BarChart
+          <LineChart
             data={{
               labels: weeklyLabels,
               datasets: [{ data: weeklyCounts }],
@@ -100,7 +101,7 @@ const Progress = ({ route }) => {
               labels: dailyLabels,
               datasets: [{ data: dailyCounts }],
             }}
-            width={screenWidth + dailyLabels.length * 40} // Ajustable para desplazamiento
+            width={screenWidth + dailyLabels.length * 100} // Ajustable para desplazamiento
             height={220}
             yAxisSuffix=" "
             chartConfig={{
